@@ -1,0 +1,89 @@
+---
+title: "TP1 Econometría Avanzada"
+author: "Casiano, Denys; Daboin, Carlos y Quispe, Anzony"
+date: "`r Sys.Date()`"
+geometry: "left=2.5cm,right=2.5cm,top=1.5cm,bottom=2cm"
+output: 
+  pdf_document :
+    keep_tex: true
+    number_sections: false
+
+header-includes:
+ \usepackage{booktabs}
+ \usepackage{longtable}
+ \usepackage{array}
+ \usepackage{multirow}
+ \usepackage{wrapfig}
+ \usepackage{float}
+ \floatplacement{figure}{H}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE,
+                      message = FALSE)
+
+# 0.0 install required packages -------------------------------------------
+# install packages not installed
+
+list.of.packages <- c("readr", "dplyr", "tidyr")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+# 0.1 Load packages -------------------------------------------------------
+library(readr)
+library(dplyr)
+library(tidyr)
+library(jtools)   #para las tablas de regresion
+```
+
+## 1. Discusion del estimador between
+
+*Discuta el modelo estimado (comente acerca de la validez del estimador between y potenciales sesgos) y comente los resultados obtenidos, en particular para las variables de justicia criminal.*
+
+```{r}
+# usa el comando export_summs del paquete jtools
+# export_summs(model)
+
+```
+
+
+## 2. Posibles problemas de heterogeneidad no observable
+
+*Explique por qué es muy posible que la presencia de heterogeneidad no observable a nivel de condado haga que las estimaciones anteriores sean sesgadas. *   
+
+Dos condados pueden ser diferentes en *confounders* no-observables (confounders son variables correlacionadas con la variable dependiente y las variables explicativas.) 
+
+Por ejemplo, es plausible que haya distintas tasas de reporte del crimen entre distintos condados, lo cual es inchequeable ya que las denuncias son la unica manera de medir el crimen. De ser esto cierto, aquellos condados similares a los demas en todas las caracteristicas observables pero con altas tasas de subreporte tendran (en promedio) una menor tasa de criminalidad y mayores tasas de arresto, lo que sesgaria la estimacion del efecto de las tasas de arresto sobre la criminalidad, haciendolo parecer de mayor magnitud.    
+
+*Realice una estimación con efectos fijos por condado.*    
+
+*Discuta por qué esta alternativa resolvería el problema de sesgo. *    
+Un estimador de efectos fijos estaria exento de toda la variabilidad atribuible a los condados, por lo que se esta controlando por todos los no-observables que varian en este nivel. 
+
+Acerca del ejemplo anterior, un estimador de efectos fijos (tambien llamado *within*) hubiese corregido las bajas tasas de criminalidad y las altas tasas de arresto de nuestros condados con alto subreporte, haciendolos comparables al resto.
+
+*Testee formalmente la hipótesis nula de ausencia de efectos fijos. *
+
+CD: Deberiamos comparar los estimadores del model between con los estimadores del modelo de efecto fijo usando el test de Hausmann
+
+*A la luz del trabajo de CyT, discuta las principales diferencias encontradas con las estimaciones anteriores.*
+
+
+# 3. Probando el estimador de efectos aleatorios
+Estime el modelo usando un estimador de efectos aleatorios. Implemente un test de
+Hausman para comparar los estimadores de efectos fijos y de efectos aleatorios y
+comente los resultados obtenidos
+
+# 4. Comparando resultados
+
+# 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
