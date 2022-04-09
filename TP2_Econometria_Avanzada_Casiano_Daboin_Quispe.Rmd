@@ -65,25 +65,46 @@ Acerca del ejemplo anterior, un estimador de efectos fijos (tambien llamado *wit
 
 *Testee formalmente la hipótesis nula de ausencia de efectos fijos. *
 
-CD: Deberiamos comparar los estimadores del model between con los estimadores del modelo de efecto fijo usando el test de Hausmann
+CD: Deberiamos comparar los estimadores del modelo between con los estimadores del modelo de efecto fijo usando el test de Hausmann.
+
+El test de especificacion de Hausman sirve para detectar si hay algun problema de heterogeneidad no observada, o variables omitidas, en nuestra especificacion.
+
+La hipotesis nula del test de Hausman es que matriz de variables omitidas es ortogonal a la matriz de variables incluidas en el modelo.
+$$
+H0: D\mu  \perp X
+$$
+$$
+H1: D\mu  \perp X
+$$
+La hipotesis tiene mayores chances de ser rechazada a medida que la diferencia entre $\hat\beta_{FE}$ y $\hat\beta_{BE}$ es mayor. 
+
+Se rechaza la hipotesis nula, confirmando que la espeficacion del modelo between padece de sesgo por efectos fijos omitidos.
+
 
 *A la luz del trabajo de CyT, discuta las principales diferencias encontradas con las estimaciones anteriores.*
 
 
 # 3. Probando el estimador de efectos aleatorios
-Estime el modelo usando un estimador de efectos aleatorios. Implemente un test de
-Hausman para comparar los estimadores de efectos fijos y de efectos aleatorios y
-comente los resultados obtenidos
+*Estime el modelo usando un estimador de efectos aleatorios. *    
+
+
+
+*Implemente un test de Hausman para comparar los estimadores de efectos fijos y de efectos aleatorios y comente los resultados obtenidos*   
+
+Seguramente encontraremos que el modelo esta mal especificado sin los efectos fijos, por la misma razon que en la pregunta 2. En este el estimador de RE, si bien es eficiente en datos de panel, esta sesgado por omitir controles relevantes.
 
 # 4. Comparando resultados
 
 # 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
-## Including Plots
 
-You can also embed plots, for example:
+*Evalúe con distintos tests la presencia de posibles efectos aleatorios y correlación serial de primer orden.*
+CD: No entiendo esta pregunta. Estan pidiendo que hagamos un test de autocorrelacion sobre los residuos de un OLS?
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+*En particular, comente intuitivamente qué es lo que sugiere el resultado correspondiente al test de autocorrelación.*
+
+
+CD:
+Esto es lo que se: Si hay autocorrelacion en datos de panel, entonces OLS es ineficiente, y conviene usar RE.
+
+Sin embargo, no conviene usar RE cuendo el se rechaza la hipotesis nula del test de Hausman: es decir, cuando hay una matriz de efectos fijos que es ortogonal a las variables explicativas. En ese caso conviene una especificacion de efectos fijos con errores estandar robustos (algo que aun no hemos visto en la clase.) La idea de aplicar errores estandar robustos es ajustar hacia arriba los errores estandar de $\beta$, porque estos estan subestimados cuando hay autocorrelacion de los errores. (Tomar con pinza y confirmar todo esto de los robust std. errors).

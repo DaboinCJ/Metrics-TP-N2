@@ -82,16 +82,20 @@ observable}\label{posibles-problemas-de-heterogeneidad-no-observable}}
 
 \emph{Explique por qué es muy posible que la presencia de heterogeneidad
 no observable a nivel de condado haga que las estimaciones anteriores
-sean sesgadas. } Dos condados pueden ser diferentes en caracteristicas
-que no-observables y que son \emph{confounders} (correlacionadas con la
-tasa de criminalidad y las variables explicativas.)
+sean sesgadas. }
 
-Por ejemplo, es plausible que haya distintos niveles de subreporte del
-crimen entre distintos condados. De ser esto cierto, un condado similar
-a los demas donde se reporte una menor proporcion de los crimines tendra
-una menor tasa de criminalidad (variable dependiente) y mayores tasas de
-arresto, lo que sesgaria negativamente el efecto de las tasas de arresto
-sobre la criminalidad, haciendolo parecer de mayor magnitud.
+Dos condados pueden ser diferentes en \emph{confounders} no-observables
+(confounders son variables correlacionadas con la variable dependiente y
+las variables explicativas.)
+
+Por ejemplo, es plausible que haya distintas tasas de reporte del crimen
+entre distintos condados, lo cual es inchequeable ya que las denuncias
+son la unica manera de medir el crimen. De ser esto cierto, aquellos
+condados similares a los demas en todas las caracteristicas observables
+pero con altas tasas de subreporte tendran (en promedio) una menor tasa
+de criminalidad y mayores tasas de arresto, lo que sesgaria la
+estimacion del efecto de las tasas de arresto sobre la criminalidad,
+haciendolo parecer de mayor magnitud.
 
 \emph{Realice una estimación con efectos fijos por condado.}
 
@@ -102,24 +106,77 @@ atribuible a los condados, por lo que se esta controlando por todos los
 no-observables que varian en este nivel.
 
 Acerca del ejemplo anterior, un estimador de efectos fijos (tambien
-llamado \emph{within}) nos permitiria hubiese corregido las bajas tasas
-de criminalidad y las altas tasas de arresto de nuestro condado con alto
-subreporte, haciendolo comparable a los demas.
+llamado \emph{within}) hubiese corregido las bajas tasas de criminalidad
+y las altas tasas de arresto de nuestros condados con alto subreporte,
+haciendolos comparables al resto.
 
 \emph{Testee formalmente la hipótesis nula de ausencia de efectos fijos.
 }
 
+CD: Deberiamos comparar los estimadores del modelo between con los
+estimadores del modelo de efecto fijo usando el test de Hausmann.
+
+El test de especificacion de Hausman sirve para detectar si hay algun
+problema de heterogeneidad no observada, o variables omitidas, en
+nuestra especificacion.
+
+La hipotesis nula del test de Hausman es que matriz de variables
+omitidas es ortogonal a la matriz de variables incluidas en el modelo.
+\[
+H0: D\mu  \perp X
+\] \[
+H1: D\mu  \perp X
+\] La hipotesis tiene mayores chances de ser rechazada a medida que la
+diferencia entre \(\hat\beta_{FE}\) y \(\hat\beta_{BE}\) es mayor.
+
+Se rechaza la hipotesis nula, confirmando que la espeficacion del modelo
+between padece de sesgo por efectos fijos omitidos.
+
 \emph{A la luz del trabajo de CyT, discuta las principales diferencias
 encontradas con las estimaciones anteriores.}
 
-\hypertarget{including-plots}{%
-\subsection{Including Plots}\label{including-plots}}
+\hypertarget{probando-el-estimador-de-efectos-aleatorios}{%
+\section{3. Probando el estimador de efectos
+aleatorios}\label{probando-el-estimador-de-efectos-aleatorios}}
 
-You can also embed plots, for example:
+\emph{Estime el modelo usando un estimador de efectos aleatorios. }
 
-\includegraphics{TP2_Econometria_Avanzada_Casiano_Daboin_Quispe_files/figure-latex/pressure-1.pdf}
+\emph{Implemente un test de Hausman para comparar los estimadores de
+efectos fijos y de efectos aleatorios y comente los resultados
+obtenidos}
 
-Note that the \texttt{echo\ =\ FALSE} parameter was added to the code
-chunk to prevent printing of the R code that generated the plot.
+Seguramente encontraremos que el modelo esta mal especificado sin los
+efectos fijos, por la misma razon que en la pregunta 2. En este el
+estimador de RE, si bien es eficiente en datos de panel, esta sesgado
+por omitir controles relevantes.
+
+\hypertarget{comparando-resultados}{%
+\section{4. Comparando resultados}\label{comparando-resultados}}
+
+\hypertarget{comentarios-sobre-la-presencia-de-efectos-aleatorios-y-correlacion-serial-de-primer-orden}{%
+\section{5. Comentarios sobre la presencia de efectos aleatorios y
+correlacion serial de primer
+orden}\label{comentarios-sobre-la-presencia-de-efectos-aleatorios-y-correlacion-serial-de-primer-orden}}
+
+\emph{Evalúe con distintos tests la presencia de posibles efectos
+aleatorios y correlación serial de primer orden.} CD: No entiendo esta
+pregunta. Estan pidiendo que hagamos un test de autocorrelacion sobre
+los residuos de un OLS?
+
+\emph{En particular, comente intuitivamente qué es lo que sugiere el
+resultado correspondiente al test de autocorrelación.}
+
+CD: Esto es lo que se: Si hay autocorrelacion en datos de panel,
+entonces OLS es ineficiente, y conviene usar RE.
+
+Sin embargo, no conviene usar RE cuendo el se rechaza la hipotesis nula
+del test de Hausman: es decir, cuando hay una matriz de efectos fijos
+que es ortogonal a las variables explicativas. En ese caso conviene una
+especificacion de efectos fijos con errores estandar robustos (algo que
+aun no hemos visto en la clase.) La idea de aplicar errores estandar
+robustos es ajustar hacia arriba los errores estandar de \(\beta\),
+porque estos estan subestimados cuando hay autocorrelacion de los
+errores. (Tomar con pinza y confirmar todo esto de los robust std.
+errors).
 
 \end{document}
