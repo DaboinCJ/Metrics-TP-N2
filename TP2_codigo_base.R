@@ -1,24 +1,30 @@
-#-------------------------------------------#
-#   T R A B A J O   P R Á C T I C O   N° 2  #
-#-------------------------------------------#
-# Autor: Carla Srebot & Agustin Sotelo      
-# Fecha: Abril 2019                         
-
-
-# Set directory:
-setwd("C:/Users/Hp Support/Videos/03 - Cursos/02 - Econometría Avanzada/03 - Econometría Avanzada - Udesa (2022)/Trabajos prácticos/Trabajo práctico 2")
-
-# Open dataset:
+# HEADER --------------------------------------------
+#
+# UNIVERSIDAD DE SAN ANDRES
+# Class: 
+#
+# Authors: Carlos J. Daboin, Denys Casiano, Anzony Quispe
+#
+# Date: 2022-04-11
+# Last Update: 
+#
+# Script Name: Codigo basico para el TP n2
+#
+#
+# 0.1 Load Libraries -----------------------------
 library(readr)
-cornwell <- read_csv("C:/Users/Hp Support/Videos/03 - Cursos/02 - Econometría Avanzada/03 - Econometría Avanzada - Udesa (2022)/Trabajos prácticos/Trabajo práctico 2/cornwell.csv")
-View(cornwell)
+library('plm')
+library(lmtest)
+library('stargazer')
 
-library('haven')
+
+# 0.2 Load Data ----------------------------------
+cornwell <- read_csv("datos/cornwell.csv")
+
 
 #-------------------------------------------#
 # Between Model (Table 3 Cornwell) ---------#
 
-library('plm')
 
 BE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
                   lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
@@ -50,7 +56,7 @@ t_hausman <- phtest(BE_model, FE_model, data=cornwell, model = c("between", "wit
 
 #-------------------------------------------#
 # Table of results -------------------------#
-library('stargazer')
+
 stargazer(BE_model, FE_model, title="Resultados", dep.var.labels=c("Crime Rate"),
           covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC',
                              'WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'),
@@ -72,7 +78,6 @@ phtest(RE_model, FE_model, data=cornwell, model = c("random", "within"), method 
 #-------------------------------------------#
 # Table of results -------------------------#
 
-library('stargazer')
 
 stargazer(BE_model, FE_model, RE_model, title="Resultados", dep.var.labels=c("Crime Rate"),
           covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC',
@@ -82,6 +87,5 @@ stargazer(BE_model, FE_model, RE_model, title="Resultados", dep.var.labels=c("Cr
 
 
 ## TEST BPG 
-library(lmtest)
 bptest(FE_model)
 
