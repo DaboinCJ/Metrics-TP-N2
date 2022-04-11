@@ -15,6 +15,7 @@ header-includes:
  \usepackage{multirow}
  \usepackage{wrapfig}
  \usepackage{float}
+ \usepackage{dcolumn}
  \floatplacement{figure}{H}
 ---
 
@@ -41,11 +42,32 @@ library(jtools)   #para las tablas de regresion
 
 *Discuta el modelo estimado (comente acerca de la validez del estimador between y potenciales sesgos) y comente los resultados obtenidos, en particular para las variables de justicia criminal.*
 
-```{r}
-# usa el comando export_summs del paquete jtools
-# export_summs(model)
+```{r include=FALSE}
+
+# Open dataset:
+library(readr)
+cornwell <- read_csv("datos/cornwell.csv")
+View(cornwell)
+
+library('plm')
+library(jtools)
+library(huxtable)
+
+#-------------------------------------------#
+# Between Model (Table 3 Cornwell) ---------#
+
+
+
+BE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
+                  lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
+                data = cornwell, index=c("county", "year"), model="between")
 
 ```
+
+El modelo between al no considerar la heterogeneidad no observada del condado produce estimadores similares a las estimaciones de corte transversal. Esto genera un problema, ya que si las características no observables están correlacionadas con $(X'_{it},P'_{it})$ se generarán estimaciones sesgadas y por tanto inconsistentes. Dado el modelo con transformación between presentado en el paper, esto significa que, el estimador solo será consistente si $(X'_{it},P'_{it})$ son ortogonales tanto a $\alpha_i$ como a $\epsilon_{it}$. 
+
+Los resultados del modelo muestran que las estimaciones para las variables de justicia criminal ($P_A, P_C, S$) cumplen con el signo negativo (sugerido por el modelo económico de crimen), a excepción de la variable $P_P$. Respecto de la significatividad estadística de las estimaciones, solo los parámetros $P_A$ y $P_C$ son signficativos. Es decir, según los resultados de este modelo, la probabilidad de detención y la probabilidad de condena son significativas para explicar la tasa de criminalidad. Finalmente, las estimaciones de los parámetros en valor absoluto cumplen con el ordenamiento de los efectos disuasorios del modelo de crimen donde $P_A>P_C>P_P$.   
+
 
 
 ## 2. Posibles problemas de heterogeneidad no observable
@@ -54,57 +76,91 @@ library(jtools)   #para las tablas de regresion
 
 Dos condados pueden ser diferentes en *confounders* no-observables (confounders son variables correlacionadas con la variable dependiente y las variables explicativas.) 
 
-Por ejemplo, es plausible que haya distintas tasas de reporte del crimen entre distintos condados, lo cual es inchequeable ya que las denuncias son la unica manera de medir el crimen. De ser esto cierto, aquellos condados similares a los demas en todas las caracteristicas observables pero con altas tasas de subreporte tendran (en promedio) una menor tasa de criminalidad y mayores tasas de arresto, lo que sesgaria la estimacion del efecto de las tasas de arresto sobre la criminalidad, haciendolo parecer de mayor magnitud.    
+Por ejemplo, es plausible que haya distintas tasas de reporte del crimen entre distintos condados, lo cual es inchequeable ya que las denuncias son la única manera de medir el crimen. De ser esto cierto, aquellos condados similares a los demás en todas las características observables pero con altas tasas de subreporte tendrán (en promedio) una menor tasa de criminalidad y mayores tasas de arresto, lo que sesgaría la estimación del efecto de las tasas de arresto sobre la criminalidad, haciéndolo parecer de mayor magnitud.    
 
 *Realice una estimación con efectos fijos por condado.*    
 
-*Discuta por qué esta alternativa resolvería el problema de sesgo. *    
-Un estimador de efectos fijos estaria exento de toda la variabilidad atribuible a los condados, por lo que se esta controlando por todos los no-observables que varian en este nivel. 
+```{r include=FALSE}
+#-------------------------------------------#
+# Within Model (Table 3 Cornwell) ---------#
 
-Acerca del ejemplo anterior, un estimador de efectos fijos (tambien llamado *within*) hubiese corregido las bajas tasas de criminalidad y las altas tasas de arresto de nuestros condados con alto subreporte, haciendolos comparables al resto.
+
+FE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
+                  lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
+                data = cornwell, index=c("county", "year"), model="within")
+```
+
+
+
+*Discuta por qué esta alternativa resolvería el problema de sesgo. *    
+Un estimador de efectos fijos estaría exento de toda la variabilidad atribuible a los condados, por lo que se esta controlando por todos los factores no-observables que varían en este nivel. 
+
+Acerca del ejemplo anterior, un estimador de efectos fijos (también llamado *within*) hubiese corregido las bajas tasas de criminalidad y las altas tasas de arresto de nuestros condados con alto subreporte, haciéndolos comparables al resto.
 
 *Testee formalmente la hipótesis nula de ausencia de efectos fijos. *
 
-CD: Deberiamos comparar los estimadores del modelo between con los estimadores del modelo de efecto fijo usando el test de Hausmann.
+CD: Deberiamos comparar los estimadores del model between con los estimadores del modelo de efecto fijo usando el test de Hausmann
 
-El test de especificacion de Hausman sirve para detectar si hay algun problema de heterogeneidad no observada, o variables omitidas, en nuestra especificacion.
+\begin{gather*}
+H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat \beta_{BE} - \hat \beta_{EF})
+\end{gather*}
 
-La hipotesis nula del test de Hausman es que matriz de variables omitidas es ortogonal a la matriz de variables incluidas en el modelo.
-$$
-H0: D\mu  \perp X
-$$
-$$
-H1: D\mu  \perp X
-$$
-La hipotesis tiene mayores chances de ser rechazada a medida que la diferencia entre $\hat\beta_{FE}$ y $\hat\beta_{BE}$ es mayor. 
-
-Se rechaza la hipotesis nula, confirmando que la espeficacion del modelo between padece de sesgo por efectos fijos omitidos.
-
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+phtest(BE_model, FE_model, data=cornwell, model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
+``` 
+El test de Hausman rechaza la hipótesis nula de ausencia de efectos fijos, es decir, en base a este test se puede concluir que la heterogeneidad es estadísticamente importante.
 
 *A la luz del trabajo de CyT, discuta las principales diferencias encontradas con las estimaciones anteriores.*
 
+El efecto de controlar por condado hace que las estimaciones (en valor absoluto) de las variables de justicia disminuyan. Por ejemplo, para la variable $P_A$ la elasticidad estimada disminuyó aproximadamente $41\%$, mientras que para la variable $P_C$ disminuyó $43\%$ aproximadamente. A diferencia de las estimaciones between, el coeficiente $P_P$ estimado por efectos fijos tiene no sólo el signo correcto (negativo) sino es significativo estadísticamente. Al igual que en el caso anterior, la estimación del parámetro $S$ es no significativa y de pequeño impacto. Finalmente, se pudo observar que los efectos disuasorios estimador (en valor absoluto) se pueden ordenar según el modelo económico del crimen ($P_A>P_C>P_P$).   
+
 
 # 3. Probando el estimador de efectos aleatorios
-*Estime el modelo usando un estimador de efectos aleatorios. *    
+Estime el modelo usando un estimador de efectos aleatorios. Implemente un test de
+Hausman para comparar los estimadores de efectos fijos y de efectos aleatorios y
+comente los resultados obtenidos
+
+```{r include=FALSE}
+#-------------------------------------------#
+# Random Efects Model (Table 3 Cornwell) ---------#
 
 
+RE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
+                  lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
+                data = cornwell, index=c("county", "year"), model="random")
 
-*Implemente un test de Hausman para comparar los estimadores de efectos fijos y de efectos aleatorios y comente los resultados obtenidos*   
 
-Seguramente encontraremos que el modelo esta mal especificado sin los efectos fijos, por la misma razon que en la pregunta 2. En este el estimador de RE, si bien es eficiente en datos de panel, esta sesgado por omitir controles relevantes.
+# Hausman Test: 
+phtest(RE_model, FE_model, data=cornwell, model = c("random", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
+```
+
+Al igual que en el caso anterior, el test de Hausman rechaza la hipótesis nula de ausencia de efectos fijos, es decir, en base a este test se puede concluir que la heterogeneidad es estadísticamente importante. Esto se da debido a que las estimaciones por efectos aleatorios no controlan efectos individuales, sino los trata como variables omitidas generando sesgos si  $(X'_{it},P'_{it})$ no son ortogonales a $\alpha_i$ y a $\epsilon_{it}$. 
 
 # 4. Comparando resultados
 
+```{r echo=FALSE, results='asis'}
+
+library("stargazer")
+
+stargazer(BE_model, FE_model, RE_model, title="Resultados", dep.var.labels=c("Tasa de criminalidad"),           covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC','WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'), notes.align = "l", align=TRUE, font.size = "small", no.space = T, header = F)
+```
+
+
+De la tabla de resultados se pudo observar que al igual que las estimaciones por efectos fijos, las estimaciones por efectos aleatorios de $P_A$, $P_C$ y $P_P$ cumplen con los signos (negativos) y el ordenamiento de los efectos disuasorios (excluyendo $S$) que afirma el modelo económico de crimen ($P_A>P_C>P_P$). Respecto de la significatividad estadística de las variables se pudo observar que en ambas estimaciones los parámetros $P_A$, $P_C$ y $P_P$ son significativos. 
+
+Así también, se pudo observar que el no controlar por efectos del condado genera sobrestimaciones en el primer y tercer modelo (between y efectos aleatorios). Por ejemplo, para $P_A$ la elasticidad se reduce en un $7.23\%$, mientras que para $P_C$ lo hace en $7.38\%$ y para $P_C$ en $2.55\%$. Respecto de las diferencias entre la estimación between y efectos fijos revisar el punto 2 del presente trabajo.
+
+Al igual que en el modelo de efectos fijos, el signo del parámetro $S$ no coincide con lo estipulado en el modelo económico de crimen, es pequeño y no es significativo a nivel estadístico.  
+
+Tal y como indican Cornwell y Trumbull, la no incorporación de efectos por condado generan grandes  diferencias en las estimaciones (en este caso entre between, within y efectos aleatorios). Así también, dados los test de Hausman se concluyó que la heterogeneidad es estadísticamente importante en esta muestra y por lo tanto las estimaciones between y de efectos aleatorios (quienes no incorporan esta característica en sus estimaciones) deben ser rechazadas.     
+
 # 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
+## Including Plots
 
-*Evalúe con distintos tests la presencia de posibles efectos aleatorios y correlación serial de primer orden.*
-CD: No entiendo esta pregunta. Estan pidiendo que hagamos un test de autocorrelacion sobre los residuos de un OLS?
+You can also embed plots, for example:
 
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
 
-*En particular, comente intuitivamente qué es lo que sugiere el resultado correspondiente al test de autocorrelación.*
-
-
-CD:
-Esto es lo que se: Si hay autocorrelacion en datos de panel, entonces OLS es ineficiente, y conviene usar RE.
-
-Sin embargo, no conviene usar RE cuendo el se rechaza la hipotesis nula del test de Hausman: es decir, cuando hay una matriz de efectos fijos que es ortogonal a las variables explicativas. En ese caso conviene una especificacion de efectos fijos con errores estandar robustos (algo que aun no hemos visto en la clase.) La idea de aplicar errores estandar robustos es ajustar hacia arriba los errores estandar de $\beta$, porque estos estan subestimados cuando hay autocorrelacion de los errores. (Tomar con pinza y confirmar todo esto de los robust std. errors).
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
