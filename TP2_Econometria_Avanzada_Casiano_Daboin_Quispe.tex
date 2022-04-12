@@ -36,7 +36,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={TP1 Econometría Avanzada},
+  pdftitle={TP2 Econometría Avanzada},
   pdfauthor={Casiano, Denys; Daboin, Carlos y Quispe, Anzony},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -59,124 +59,294 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\usepackage{booktabs} \usepackage{longtable} \usepackage{array} \usepackage{multirow} \usepackage{wrapfig} \usepackage{float} \floatplacement{figure}{H}
+\usepackage{booktabs} \usepackage{longtable} \usepackage{array} \usepackage{multirow} \usepackage{wrapfig} \usepackage{float} \usepackage{dcolumn} \floatplacement{figure}{H}
 
-\title{TP1 Econometría Avanzada}
+\title{TP2 Econometría Avanzada}
 \author{Casiano, Denys; Daboin, Carlos y Quispe, Anzony}
-\date{2022-04-09}
+\date{2022-04-12}
 
 \begin{document}
 \maketitle
 
-\hypertarget{discusion-del-estimador-between}{%
-\subsection{1. Discusion del estimador
-between}\label{discusion-del-estimador-between}}
+\hypertarget{notacion}{%
+\subsection{Notacion}\label{notacion}}
 
-\emph{Discuta el modelo estimado (comente acerca de la validez del
-estimador between y potenciales sesgos) y comente los resultados
-obtenidos, en particular para las variables de justicia criminal.}
+Las variables consideradas en los modelos disctuidos a continuación son
+las siguientes:
 
-\hypertarget{posibles-problemas-de-heterogeneidad-no-observable}{%
-\subsection{2. Posibles problemas de heterogeneidad no
-observable}\label{posibles-problemas-de-heterogeneidad-no-observable}}
+\begin{itemize}
+\tightlist
+\item
+  \(R_{it}\) : la tasa de criminalidad del condado i en el periodo t.
+\item
+  \(X'_{it}\) : la matriz de controles del rendimiento de la oportunidad
+  legal.
+\item
+  \(P'_{it}\) : la matriz de variables del sistema judicial.
+\item
+  \(\alpha_{i}\) son los efectos fijos.
+\item
+  \(\epsilon_{it}\) : el termino de error.
+\end{itemize}
 
-\emph{Explique por qué es muy posible que la presencia de heterogeneidad
-no observable a nivel de condado haga que las estimaciones anteriores
-sean sesgadas. }
+\hypertarget{discusion-del-estimador-between-be}{%
+\subsection{1. Discusion del estimador between
+(BE)}\label{discusion-del-estimador-between-be}}
 
-Dos condados pueden ser diferentes en \emph{confounders} no-observables
-(confounders son variables correlacionadas con la variable dependiente y
-las variables explicativas.)
+El estimador between (BE) en datos de panel genera estimadores similares
+a las del estimador MCO en corte transversal y no considera la
+heterogeneidad no-observada a nivel de condado. Esto genera un problema
+si las características no observables están correlacionadas con
+\((X'_{it},P'_{it})\), ya que se generarán estimaciones sesgadas e
+inconsistentes. La estimación BE presentada en el paper generaría
+estimadores válidos si \((X'_{it},P'_{it})\) fueran ortogonales tanto a
+\(\alpha_i\) como a \(\epsilon_{it}\).
 
-Por ejemplo, es plausible que haya distintas tasas de reporte del crimen
-entre distintos condados, lo cual es inchequeable ya que las denuncias
-son la unica manera de medir el crimen. De ser esto cierto, aquellos
-condados similares a los demas en todas las caracteristicas observables
-pero con altas tasas de subreporte tendran (en promedio) una menor tasa
-de criminalidad y mayores tasas de arresto, lo que sesgaria la
-estimacion del efecto de las tasas de arresto sobre la criminalidad,
-haciendolo parecer de mayor magnitud.
+Los resultados del modelo muestran que las estimaciones para las
+variables de justicia criminal (\(P_A, P_C, S\)) cumplen con el signo
+negativo sugerido por el modelo económico de crimen (a excepción de la
+variable \(P_P\)). Sólo los parámetros \(P_A\) y \(P_C\) son
+signficativos. Según los resultados de este modelo, la probabilidad de
+detención y la probabilidad de condena son significativas para explicar
+reducción de la tasa de criminalidad. Finalmente, las estimaciones de
+los parámetros en valor absoluto cumplen con el ordenamiento de los
+efectos disuasorios del modelo de crimen donde \(P_A>P_C>P_P\).
 
-\emph{Realice una estimación con efectos fijos por condado.}
+\hypertarget{posibles-problemas-de-heterogeneidad-no-observable-y-el-estimador-de-efectos-fijos-fe}{%
+\subsection{2. Posibles problemas de heterogeneidad no observable y el
+estimador de efectos fijos
+(FE)}\label{posibles-problemas-de-heterogeneidad-no-observable-y-el-estimador-de-efectos-fijos-fe}}
 
-\emph{Discuta por qué esta alternativa resolvería el problema de sesgo.
-}\\
-Un estimador de efectos fijos estaria exento de toda la variabilidad
-atribuible a los condados, por lo que se esta controlando por todos los
-no-observables que varian en este nivel.
+Existe el riesgo de que los atributos no-observables de los condados
+estén correlacionados con la variable dependiente y las variables
+explicativas, generando estimadores sesgados. Por ejemplo, imaginemos
+que las tasa de reporte del crimen varíe a nivel de condado y que es
+no-observable (lo cúal es bastante plausible). En este caso, aquellos
+condados con mayores tasas de subreporte tendrán (en promedio) una menor
+tasa de criminalidad y mayores tasas de arresto, a pesar de haber
+controlado previamente por las demás variables. Es decir, el subreporte
+sesgaría la estimación de los efectos de interés, haciéndolos parecer de
+mayor magnitud.
 
-Acerca del ejemplo anterior, un estimador de efectos fijos (tambien
-llamado \emph{within}) hubiese corregido las bajas tasas de criminalidad
-y las altas tasas de arresto de nuestros condados con alto subreporte,
-haciendolos comparables al resto.
+El estimador de efectos fijos (FE o within) elimina toda heterogeneidad
+no-observable a nivel de condado que permanezca fija en el tiempo. Esto
+se logra al añadir variables binarias ``fijas'' a nivel condado que
+sustraen su promedio histórico a todas las demás variables. De esta
+forma las variables del modelo estan exentas de diferencias de promedio
+a este nivel.
 
-\emph{Testee formalmente la hipótesis nula de ausencia de efectos fijos.
-}
+Volviendo al ejemplo anterior, un estimador FE hubiese corregido las
+diferencias en criminalidad y tasas de arresto promedio entre condados,
+haciéndolos más comparables.
 
-CD: Deberiamos comparar los estimadores del modelo between con los
-estimadores del modelo de efecto fijo usando el test de Hausmann.
+A continuación, aplicamos el test de especificación de Hausman verificar
+la existencia de varaibilidad no observable a nivel de condado. La
+hipotesis nula de este test es que la variabilidad no observable a nivel
+de condado es ortogonal a las variables explicativas del modelo. El
+estadístico se construye a partir de las diferencias entre los
+estimadores del modelo BE y del modelo de FE (ambos estimados con la
+función plm::plm) según la siguiente fórmula:
 
-El test de especificacion de Hausman sirve para detectar si hay algun
-problema de heterogeneidad no observada, o variables omitidas, en
-nuestra especificacion.
+\begin{gather*}
+H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat \beta_{BE} - \hat \beta_{EF}) \sim \chi^2
+\end{gather*}
 
-La hipotesis nula del test de Hausman es que matriz de variables
-omitidas es ortogonal a la matriz de variables incluidas en el modelo.
-\[
-H0: D\mu  \perp X
-\] \[
-H1: D\mu  \perp X
-\] La hipotesis tiene mayores chances de ser rechazada a medida que la
-diferencia entre \(\hat\beta_{FE}\) y \(\hat\beta_{BE}\) es mayor.
+\begin{verbatim}
+## 
+##  Hausman Test
+## 
+## data:  lcrmrte ~ lprbarr + lprbconv + lprbpris + lavgsen + lpolpc +  ...
+## chisq = 53.591, df = 16, p-value = 6.047e-06
+## alternative hypothesis: one model is inconsistent
+\end{verbatim}
 
-Se rechaza la hipotesis nula, confirmando que la espeficacion del modelo
-between padece de sesgo por efectos fijos omitidos.
+El test de Hausman nos permite rechazar la hipótesis nula de que
+\(\alpha_i\) es ortogonal a \((X'_{it},P'_{it})\), es decir, en base a
+este test se puede concluir que la heterogeneidad no observable a nivel
+de condado es estadísticamente significativa y que conviene usar el
+estimador FE.
 
-\emph{A la luz del trabajo de CyT, discuta las principales diferencias
-encontradas con las estimaciones anteriores.}
+\textbf{Insertar tabla de Anzony}
+
+El efecto de controlar por condado hace que las estimaciones (en valor
+absoluto) de las variables de justicia disminuyan. Por ejemplo, para la
+variable \(P_A\) la elasticidad estimada disminuyó aproximadamente
+\(41\%\), mientras que para la variable \(P_C\) disminuyó \(43\%\)
+aproximadamente. A diferencia de las estimaciones between, el
+coeficiente \(P_P\) estimado por efectos fijos tiene no sólo el signo
+correcto (negativo) sino es significativo estadísticamente. Al igual que
+en el caso anterior, la estimación del parámetro \(S\) es no
+significativa y de pequeño impacto. Finalmente, se pudo observar que los
+efectos disuasorios estimador (en valor absoluto) se pueden ordenar
+según el modelo económico del crimen (\(P_A>P_C>P_P\)).
 
 \hypertarget{probando-el-estimador-de-efectos-aleatorios}{%
 \section{3. Probando el estimador de efectos
 aleatorios}\label{probando-el-estimador-de-efectos-aleatorios}}
 
-\emph{Estime el modelo usando un estimador de efectos aleatorios. }
-
-\emph{Implemente un test de Hausman para comparar los estimadores de
-efectos fijos y de efectos aleatorios y comente los resultados
-obtenidos}
-
-Seguramente encontraremos que el modelo esta mal especificado sin los
-efectos fijos, por la misma razon que en la pregunta 2. En este el
-estimador de RE, si bien es eficiente en datos de panel, esta sesgado
-por omitir controles relevantes.
+Al igual que en el caso anterior, el test de Hausman rechaza la
+hipótesis nula de que \(\alpha_i\) es ortogonal \((X'_{it},P'_{it})\).
+En base a este resultado se puede concluir que la heterogeneidad no
+observable a nivel de condado es estadísticamente significativa. Esto se
+da debido a que las estimaciones por efectos aleatorios no controlan
+efectos individuales (a nivel de condado), sino que los omite generando
+sesgos si \((X'_{it},P'_{it})\) no son ortogonales a \(\alpha_i\) y a
+\(\epsilon_{it}\).
 
 \hypertarget{comparando-resultados}{%
 \section{4. Comparando resultados}\label{comparando-resultados}}
+
+\emph{Insertar tabla Anzony}
+
+\begin{table}[!htbp] \centering 
+  \caption{Resultados} 
+  \label{} 
+\small 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{3}{c}{Tasa de criminalidad} \\ 
+ & \multicolumn{1}{c}{Between (BE)} & \multicolumn{1}{c}{Within (EF)} & \multicolumn{1}{c}{Random Effects (RE)} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ $P_{A}$ & -0.648^{***} & -0.385^{***} & -0.415^{***} \\ 
+  & (0.088) & (0.033) & (0.030) \\ 
+  $P_{C}$ & -0.528^{***} & -0.301^{***} & -0.325^{***} \\ 
+  & (0.067) & (0.021) & (0.020) \\ 
+  $P_{P}$ & 0.297 & -0.191^{***} & -0.196^{***} \\ 
+  & (0.231) & (0.033) & (0.033) \\ 
+  S & -0.236 & 0.026 & 0.019 \\ 
+  & (0.174) & (0.025) & (0.026) \\ 
+  Police & 0.364^{***} & 0.424^{***} & 0.415^{***} \\ 
+  & (0.060) & (0.027) & (0.025) \\ 
+  Density & 0.168^{**} & 0.409 & 0.469^{***} \\ 
+  & (0.077) & (0.279) & (0.051) \\ 
+  Percent of young male & -0.095 & 0.381 & -0.132 \\ 
+  & (0.158) & (0.325) & (0.123) \\ 
+  WCON & 0.195 & -0.034 & -0.020 \\ 
+  & (0.210) & (0.039) & (0.039) \\ 
+  WTUC & -0.196 & 0.029^{*} & 0.025 \\ 
+  & (0.170) & (0.018) & (0.018) \\ 
+  WTRD & 0.129 & -0.039 & -0.035 \\ 
+  & (0.278) & (0.041) & (0.042) \\ 
+  WFIR & 0.113 & -0.013 & -0.017 \\ 
+  & (0.220) & (0.029) & (0.029) \\ 
+  WSER & -0.106 & 0.004 & -0.004 \\ 
+  & (0.163) & (0.019) & (0.020) \\ 
+  WMFG & -0.025 & -0.388^{***} & -0.264^{***} \\ 
+  & (0.134) & (0.102) & (0.078) \\ 
+  WFED & 0.156 & -0.553^{***} & -0.394^{***} \\ 
+  & (0.287) & (0.165) & (0.144) \\ 
+  WSTA & -0.284 & 0.216^{**} & 0.009 \\ 
+  & (0.256) & (0.101) & (0.086) \\ 
+  WLOC & 0.010 & 0.341^{***} & 0.209^{**} \\ 
+  & (0.463) & (0.107) & (0.099) \\ 
+  West & -0.230^{**} &  & -0.207^{**} \\ 
+  & (0.108) &  & (0.105) \\ 
+  Central & -0.164^{**} &  & -0.180^{***} \\ 
+  & (0.064) &  & (0.062) \\ 
+  Urban & -0.035 &  & -0.236^{**} \\ 
+  & (0.132) &  & (0.114) \\ 
+  Percent minority & 0.148^{***} &  & 0.199^{***} \\ 
+  & (0.049) &  & (0.043) \\ 
+  Constant & -2.097 &  & 0.252 \\ 
+  & (2.822) &  & (0.561) \\ 
+ \hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{90} & \multicolumn{1}{c}{630} & \multicolumn{1}{c}{630} \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.880} & \multicolumn{1}{c}{0.425} & \multicolumn{1}{c}{0.566} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.846} & \multicolumn{1}{c}{0.310} & \multicolumn{1}{c}{0.551} \\ 
+F Statistic & \multicolumn{1}{c}{25.412$^{***}$ (df = 20; 69)} & \multicolumn{1}{c}{24.220$^{***}$ (df = 16; 524)} & \multicolumn{1}{c}{793.199$^{***}$} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{l}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+En la tabla 1 se observa que al igual que las estimaciones por efectos
+fijos, las estimaciones por efectos aleatorios de \(P_A\), \(P_C\) y
+\(P_P\) cumplen con los signos (negativos) y el ordenamiento de los
+efectos disuasorios (excluyendo \(S\)) que afirma el modelo económico de
+crimen (\(P_A>P_C>P_P\)). En ambas estimaciones se pudo observar que los
+parámetros \(P_A\), \(P_C\) y \(P_P\) son significativos.
+
+Así también, observa que las elasticidades de \(P_A\), \(P_C\) y \(P_P\)
+son mayores en los modelos between y efectos aleatorios que en el modelo
+within. Por ejemplo se observa que la elasticidad de \(P_A\) en el
+modelo within se reduce en un \(7.23\%\) respecto a la obtenida con
+efectos aleatorios, mientras que para \(P_C\) lo hace en \(7.38\%\) y
+para \(P_C\) en \(2.55\%\). Las diferencias de magnitud entre la
+estimación between y within fueron planteadas en el inciso 2.
+
+Al igual que en el modelo de efectos fijos, el signo de \(S\) en los
+resultados de efectos aleatorios no coincide con lo estipulado en el
+modelo económico de crimen: es pequeño y no es significativo a nivel
+estadístico.
+
+Tal y como indican Cornwell y Trumbull, omision de efectos por condado
+generan grandes diferencias en las estimaciones (en este caso entre
+between, within y efectos aleatorios). Dados los resultados del test de
+Hausman se concluyó que la heterogeneidad es estadísticamente importante
+en esta muestra, podemos concluir las estimaciones between y efectos
+aleatorios sobreestiman el efecto estimado de las variables de law
+enforcement, y que el modelo within es mas conveniente para anular este
+sesgo.
 
 \hypertarget{comentarios-sobre-la-presencia-de-efectos-aleatorios-y-correlacion-serial-de-primer-orden}{%
 \section{5. Comentarios sobre la presencia de efectos aleatorios y
 correlacion serial de primer
 orden}\label{comentarios-sobre-la-presencia-de-efectos-aleatorios-y-correlacion-serial-de-primer-orden}}
 
-\emph{Evalúe con distintos tests la presencia de posibles efectos
-aleatorios y correlación serial de primer orden.} CD: No entiendo esta
-pregunta. Estan pidiendo que hagamos un test de autocorrelacion sobre
-los residuos de un OLS?
+\begin{verbatim}
+## 
+##  studentized Breusch-Pagan test
+## 
+## data:  ols
+## BP = 188.15, df = 20, p-value < 2.2e-16
+\end{verbatim}
 
-\emph{En particular, comente intuitivamente qué es lo que sugiere el
-resultado correspondiente al test de autocorrelación.}
+Para evaluar la presencia de efectos aleatorios se estimó un modelo a
+traves de mco y se utilizo el test de Breusch-Pagan. La hipotesis nula
+es la no existencia de efectos aleatorios (\(H_0: \sigma^2_\mu=0\)),
+testeando la presencia de heterocedasticidad en los erroes del modelo de
+pooled. Los resultados rechazan la hipotesis nula; por lo tanto, existen
+efectos aleatorios, los errores son heterocedasticos.
 
-CD: Esto es lo que se: Si hay autocorrelacion en datos de panel,
-entonces OLS es ineficiente, y conviene usar RE.
+\begin{verbatim}
+## 
+##  Durbin-Watson test for serial correlation in panel models
+## 
+## data:  lcrmrte ~ lprbarr + lprbconv + lprbpris + lavgsen + lpolpc +     ldensity + lpctymle + lwcon + lwtuc + lwtrd + lwfir + lwser +     lwmfg + lwfed + lwsta + lwloc + west + central + urban +     lpctmin
+## DW = 1.357, p-value < 2.2e-16
+## alternative hypothesis: serial correlation in idiosyncratic errors
+\end{verbatim}
 
-Sin embargo, no conviene usar RE cuendo el se rechaza la hipotesis nula
-del test de Hausman: es decir, cuando hay una matriz de efectos fijos
-que es ortogonal a las variables explicativas. En ese caso conviene una
-especificacion de efectos fijos con errores estandar robustos (algo que
-aun no hemos visto en la clase.) La idea de aplicar errores estandar
-robustos es ajustar hacia arriba los errores estandar de \(\beta\),
-porque estos estan subestimados cuando hay autocorrelacion de los
-errores. (Tomar con pinza y confirmar todo esto de los robust std.
-errors).
+Teniendo en cuenta la siguiente definición de los errores:
+
+\begin{gather*}
+u_{it} = \mu_i+ \epsilon_{it} \\
+u_{it-1} = \mu_i+ \epsilon_{it-1}
+\end{gather*}
+
+Se hace el test de autocorrelación serial sobre el modelo de efectos
+aleatorios y se rechaza la hipótesis nula. Por lo tanto, este modelo
+presenta autocorrelación. Esto puede estar relacionado con la omisión de
+los efectos fijos que genera que los errores \(u_{it}\) y \(u_{it-1}\)
+estén correlacionados generando un problema de sesgo.
+
+\begin{verbatim}
+## 
+##  Durbin-Watson test for serial correlation in panel models
+## 
+## data:  lcrmrte ~ lprbarr + lprbconv + lprbpris + lavgsen + lpolpc +     ldensity + lpctymle + lwcon + lwtuc + lwtrd + lwfir + lwser +     lwmfg + lwfed + lwsta + lwloc + west + central + urban +     lpctmin
+## DW = 1.687, p-value = 4.506e-05
+## alternative hypothesis: serial correlation in idiosyncratic errors
+\end{verbatim}
+
+Se realiza el test de autocorrelación serial sobre el modelo de efectos
+fijos y se rechaza la hipótesis nula. Por lo tanto, el modelo presenta
+autocorrelación serial. Esto sugiere que los errores \(\epsilon_{it}\) y
+\(\epsilon_{it-1}\) esten correlacionados.
 
 \end{document}

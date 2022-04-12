@@ -1,5 +1,5 @@
 ---
-title: "TP1 Econometría Avanzada"
+title: "TP2 Econometría Avanzada"
 author: "Casiano, Denys; Daboin, Carlos y Quispe, Anzony"
 date: "`r Sys.Date()`"
 geometry: "left=2.5cm,right=2.5cm,top=1.5cm,bottom=2cm"
@@ -20,6 +20,9 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
+# Nota de los autores:
+## Este documento contiene todo el analisis econometrico necesario para responder las consignas.
+
 knitr::opts_chunk$set(echo = FALSE, 
                       warning = FALSE,
                       message = FALSE)
@@ -38,7 +41,7 @@ library(tidyr)
 library(jtools)   #para las tablas de regresion
 ```
 
-## Notacion
+## Notación
 
 Las variables consideradas en los modelos disctuidos a continuación son las siguientes: 
 
@@ -79,14 +82,12 @@ BE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpct
 <!-- $$  -->
 
 
-El modelo between al no considerar la heterogeneidad no observada del condado produce estimadores similares a las estimaciones de corte transversal. Esto genera un problema, ya que si las características no observables están correlacionadas con $(X'_{it},P'_{it})$ se generarán estimaciones sesgadas y por tanto inconsistentes. Dado el modelo con transformación *between* presentado en el paper, el estimador solo será consistente si $(X'_{it},P'_{it})$ son ortogonales tanto a $\alpha_i$ como a $\epsilon_{it}$. 
+El estimador between (BE) en datos de panel estimadores basados en el promedio histórico de cada sujeto (condado), por lo que omite cualquier tipo de heterogeneidad no-observada a nivel de estos. Si las características no observables estuvieran correlacionadas con $(X'_{it},P'_{it})$ el estimador BE produciría estimaciones sesgades. La estimación BE presentada en el paper sólo sería válida si $(X'_{it},P'_{it})$ fueran ortogonales tanto a $\alpha_i$ como a $\epsilon_{it}$. 
 
-Los resultados del modelo muestran que las estimaciones para las variables de justicia criminal ($P_A, P_C, S$) cumplen con el signo negativo (sugerido por el modelo económico de crimen), a excepción de la variable $P_P$. Solo los parámetros $P_A$ y $P_C$ son signficativos. Es decir, según los resultados de este modelo, la probabilidad de detención y la probabilidad de condena son significativas para explicar la tasa de criminalidad. Finalmente, las estimaciones de los parámetros en valor absoluto cumplen con el ordenamiento de los efectos disuasorios del modelo de crimen donde $P_A>P_C>P_P$.   
+Los coeficientes de las variables de justicia criminal ($P_A, P_C, S$) cumplen con el signo negativo sugerido por el modelo económico de crimen en nuestra réplica del modelo BE, con la excepción de $P_P$ (ver Tabla 1). Sólo los parámetros $P_A$ y $P_C$ son signficativos. Según los resultados de este modelo, la probabilidad de detención y la probabilidad de condena son significativas para explicar reducción de la tasa de criminalidad. Finalmente, las estimaciones de los parámetros en valor absoluto cumplen con el ordenamiento de los efectos disuasorios del modelo de crimen donde $|P_A|>|P_C|>|P_P|$.   
 
 
 ## 2. Posibles problemas de heterogeneidad no observable y el estimador de efectos fijos (FE)
-
-Existe el riesgo de que los atributos no-observables de los condados estén correlacionados con la variable dependiente y las variables explicativas, generando estimadores sesgados. Por ejemplo, imaginemos que las tasa de reporte del crimen sea distinta en distintos condados y sea no-observable (lo cual es bastante plausible). En este caso, aquellos condados con mayores tasas de subreporte tendrán (en promedio) una menor tasa de criminalidad y mayores tasas de arresto, a pesar de haber controlado previamente por las demás variables. Es decir, el subreporte sesgaría la estimación del efecto de interés, haciéndolo parecer de mayor magnitud.    
 
 ```{r include=FALSE}
 #-------------------------------------------#
@@ -98,13 +99,13 @@ FE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpct
                 data = cornwell, index=c("county", "year"), model="within")
 ```
 
+Existe el riesgo de que los atributos no-observables de los condados estén correlacionados con $(X'_{it},P'_{it})$ y con $R_{it}$, generando estimadores sesgados. Por ejemplo, imaginemos que las tasa de reporte del crimen varía a nivel de condado y que es no-observable (lo cúal es bastante plausible). En este caso, aquellos condados con mayores tasas de subreporte tendrán (en promedio) una menor tasa de criminalidad y mayores tasas de arresto, a pesar de haber controlado previamente por las demás variables. Una situación así sesgaría la estimación de los efectos de interés, haciéndolos parecer de mayor magnitud.    
 
-El estimador de efectos fijos (FE o *within*) elimina toda heterogeneidad no-observable a nivel de condado que permanezca fija en el tiempo. Esto se logra al añadir variables binarias "fijas" por condado que sustraen su promedio histórico a todas las demás variables. De esta forma las variables del modelo estan exentas de diferencias de promedio a nivel de condado.
+El estimador de efectos fijos (FE o within) elimina toda heterogeneidad no-observable a nivel de condado y fija en el tiempo. Esto se logra al añadir variables binarias "fijas" a nivel condado que sustraen su promedio histórico a todas las demás variables. De esta forma las variables del modelo estan exentas de diferencias de promedio a este nivel.
 
-Volviendo al ejemplo anterior, un estimador FE hubiese corregido las diferencias en  criminalidad y tasas de arresto promedio entre condados, haciéndolos más comparables.
+Volviendo al ejemplo anterior, un estimador FE hubiese corregido las diferencias en  criminalidad y tasas de arresto promedio entre condados con alto y bajo subreporte, haciéndolos más comparables.
 
-
-A continuación aplicamos el test de especificación de Hausman verificar la existencia de varaibilidad no observable a nivel de condado. La hipotesis nula de este test es que la variabilidad no observable a nivel de condado es ortogonal a las variables explicativas del modelo. El estadístico se construye a partir de las diferencias entre los estimadores del modelo BE y del modelo de FE según la siguiente fórmula:
+A continuación, aplicamos el test de especificación de Hausman para verificar la existencia de varaibilidad no-observable a nivel de condado. La hipótesis nula del test es que la variabilidad no observable a nivel de condado es ortogonal a las variables explicativas del modelo. El estadístico se construye a partir de las diferencias entre los estimadores del modelo BE y del modelo de FE según la siguiente fórmula:
 
 \begin{gather*}
 H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat \beta_{BE} - \hat \beta_{EF}) \sim \chi^2
@@ -117,18 +118,14 @@ phtest(BE_model, FE_model,
        model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 
 ``` 
-
-
-El test de Hausman rechaza la hipótesis nula de que $\alpha_i$ es ortogonal $(X'_{it},P'_{it})$, es decir, en base a este test se puede concluir que la heterogeneidad no observable a nivel de condado es estadísticamente importante y que conviene usar la estimacion con efectos fijos.
-
-
-
 **Insertar tabla de Anzony**
 
-El efecto de controlar por condado hace que las estimaciones (en valor absoluto) de las variables de justicia disminuyan. Por ejemplo, para la variable $P_A$ la elasticidad estimada disminuyó aproximadamente $41\%$, mientras que para la variable $P_C$ disminuyó $43\%$ aproximadamente. A diferencia de las estimaciones between, el coeficiente $P_P$ estimado por efectos fijos tiene no sólo el signo correcto (negativo) sino es significativo estadísticamente. Al igual que en el caso anterior, la estimación del parámetro $S$ es no significativa y de pequeño impacto. Finalmente, se pudo observar que los efectos disuasorios estimador (en valor absoluto) se pueden ordenar según el modelo económico del crimen ($P_A>P_C>P_P$).   
+El test de Hausman nos permite rechazar la hipótesis nula, lo que nos invita a usar el estimador FE para lidiar con la heterogeneidad no observable a nivel de condado (ver Tabla 1).
+
+El efecto de controlar por condado hace que las estimaciones (en valor absoluto) de las variables de justicia disminuyan. Por ejemplo, la elasticidad estimada de la variables $P_A$ y $P_C$ disminuyeron en un $41\%$ y $43%$, respectivamente. A diferencia de las estimaciones between, el coeficiente $P_P$ estimado por efectos fijos tiene el signo correcto (negativo) y es significativo estadísticamente. Al igual que en el caso anterior, la estimación del parámetro $S$ es no significativa y de baja magnitud. Finalmente, se pudo observar que los efectos disuasorios estimados se pueden ordenar según el modelo económico del crimen ($|P_A|>|P_C|>|P_P|$).   
 
 
-# 3. Probando el estimador de efectos aleatorios
+# 3. Probando el estimador de efectos aleatorios (RE)
 
 ```{r include=FALSE}
 #-------------------------------------------#
@@ -145,7 +142,9 @@ RE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpct
 phtest(RE_model, FE_model, data=cornwell, model = c("random", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 ```
 
-Al igual que en el caso anterior, el test de Hausman rechaza la hipótesis nula de que $\alpha_i$ es ortogonal $(X'_{it},P'_{it})$. En base a este resultado se puede concluir que la heterogeneidad no observable a nivel de condado es estadísticamente significativa. Esto se da debido a que las estimaciones por efectos aleatorios no controlan efectos individuales (a nivel de condado), sino que los omite generando sesgos si  $(X'_{it},P'_{it})$ no son ortogonales a $\alpha_i$ y a $\epsilon_{it}$. 
+Realizamos nuevamente el test de Hausman, pero esta vez comparando los estimadores del modelo de efectos aleatorios (RE) con los del modelo FE. Al igual que en el caso anterior, el estadístico nos permite rechazar la hipótesis nula de que $\alpha_i$ es ortogonal $(X'_{it},P'_{it})$. De nuevo, se puede concluir que la heterogeneidad no-observable a nivel de condado es estadísticamente significativa.
+
+Esto se da debido a que las estimaciones por efectos aleatorios no controlan efectos individuales (a nivel de condado), sino que los omite generando los sesgos discutidos anteriormente. 
 
 # 4. Comparando resultados
 
@@ -157,17 +156,15 @@ library("stargazer")
 
 stargazer(BE_model, FE_model, RE_model, 
           title="Resultados", dep.var.labels=c("Tasa de criminalidad"),          
-          column.labels = c("Between (BE)", "Within (EF)","Random Effects (RE)" ),
+          column.labels = c("Between (BE)", "Within (FE)","Random Effects (RE)" ),
           covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC','WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'),
           notes.align = "l", align=TRUE, font.size = "small", no.space = T, header = F)
 ```
 
 
-En la tabla 1 se observa que al igual que las estimaciones por efectos fijos, las estimaciones por efectos aleatorios de $P_A$, $P_C$ y $P_P$ cumplen con los signos (negativos) y el ordenamiento de los efectos disuasorios (excluyendo $S$) que afirma el modelo económico de crimen ($P_A>P_C>P_P$). En ambas estimaciones se pudo observar que los parámetros $P_A$, $P_C$ y $P_P$ son significativos. 
+En la tabla 1 se observa que las estimaciones por FE y por RE (segunda y tercera columna) de $P_A$, $P_C$ y $P_P$ muestran los signos (negativos) y el ordenamiento propuesto por el modelo económico de crimen ($|P_A|>|P_C|>|P_P|$). Pos parámetros $P_A$, $P_C$ y $P_P$ son significativos en ambas estimaciones. Por otro lado, el coeficiente de $S$ muestra signo positivo y no es estadísticamente significativo.
 
-Así también, observa que las elasticidades de $P_A$, $P_C$ y $P_P$ son mayores en los modelos between y efectos aleatorios que en el modelo within. Por ejemplo se observa que la elasticidad de $P_A$ en el modelo within se reduce en un $7.23\%$ respecto a la obtenida con efectos aleatorios, mientras que para $P_C$ lo hace en $7.38\%$ y para $P_C$ en $2.55\%$. Las diferencias de magnitud entre la estimación between y within fueron planteadas en el inciso 2.
-
-Al igual que en el modelo de efectos fijos, el signo de $S$ en los resultados de efectos aleatorios no coincide con lo estipulado en el modelo económico de crimen: es pequeño y no es significativo a nivel estadístico.  
+Así también, observa que las elasticidades de $P_A$, $P_C$ y $P_P$ son mayores en los modelos BE y RE que en el modelo FE. Por ejemplo, se observa que la elasticidad de $P_A$ en el modelo FE se reduce en un $7.23\%$ respecto a la obtenida con RE, mientras que para $P_C$ lo hace en $7.38\%$ y para $P_C$ en $2.55\%$. Las diferencias de magnitud entre la estimación BE y FE fueron planteadas en el inciso 2.
 
 Tal y como indican Cornwell y Trumbull, omision de efectos por condado generan grandes diferencias en las estimaciones (en este caso entre between, within y efectos aleatorios). Dados los resultados del test de Hausman se concluyó que la heterogeneidad es estadísticamente importante en esta muestra, podemos concluir las estimaciones between y efectos aleatorios sobreestiman el efecto estimado de las variables de law enforcement, y que el modelo within es mas conveniente para anular este sesgo.     
 
