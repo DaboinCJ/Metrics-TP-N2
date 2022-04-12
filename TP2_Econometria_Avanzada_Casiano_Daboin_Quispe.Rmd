@@ -22,7 +22,6 @@ header-includes:
 ```{r setup, include=FALSE}
 # Nota de los autores:
 ## Este documento contiene todo el analisis econometrico necesario para responder las consignas.
-#
 
 knitr::opts_chunk$set(echo = FALSE, 
                       warning = FALSE,
@@ -83,9 +82,11 @@ BE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpct
 <!-- $$  -->
 
 
-El estimador between (BE) en datos de panel estimadores basados en el promedio histórico de cada sujeto (condado), por lo que omite cualquier tipo de heterogeneidad no-observada a nivel de estos. Si las características no observables estuvieran correlacionadas con $(X'_{it},P'_{it})$ el estimador BE produciría estimaciones sesgades. La estimación BE presentada en el paper sólo sería válida si $(X'_{it},P'_{it})$ fueran ortogonales tanto a $\alpha_i$ como a $\epsilon_{it}$. 
+El estimador between (BE) básicamente un OLS de corte transversal fijado con el promedio histórico de las variables a nivel sujeto (condado), por lo que no controla ningún tipo de heterogeneidad no-observada entre estos. Si las características no observables estuvieran correlacionadas con $(X'_{it},P'_{it})$ el estimador BE produciría estimaciones sesgadas. La estimación BE presentada en el paper sólo sería válida si $(X'_{it},P'_{it})$ fueran ortogonales tanto a $\alpha_i$ como a $\epsilon_{it}$. 
 
-Los coeficientes de las variables de justicia criminal ($P_A, P_C, S$) cumplen con el signo negativo sugerido por el modelo económico de crimen en nuestra réplica del modelo BE, con la excepción de $P_P$ (ver Tabla 1). Sólo los parámetros $P_A$ y $P_C$ son signficativos. Según los resultados de este modelo, la probabilidad de detención y la probabilidad de condena son significativas para explicar reducción de la tasa de criminalidad. Finalmente, las estimaciones de los parámetros en valor absoluto cumplen con el ordenamiento de los efectos disuasorios del modelo de crimen donde $|P_A|>|P_C|>|P_P|$.   
+Los coeficientes de las variables de justicia criminal $P_A, P_C$ y $S$ cumplen con el signo negativo sugerido por el modelo económico de crimen en nuestra réplica del modelo BE (ver Tabla 3), mientras que el coeficiente de $P_P$ no. Sólo los parámetros $P_A$ y $P_C$ son signficativos. Según los resultados de este modelo, la probabilidad de detención y la probabilidad de condena son significativas para explicar reducción de la tasa de criminalidad. 
+
+Finalmente, las estimaciones de los parámetros en valor absoluto cumplen con el ordenamiento de los efectos disuasorios del modelo de crimen donde $|P_A|>|P_C|>|P_P|$.   
 
 
 ## 2. Posibles problemas de heterogeneidad no observable y el estimador de efectos fijos (FE)
@@ -113,15 +114,33 @@ H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat
 \end{gather*}
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r include=FALSE, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# los resultados de esta prueba fueron tabulados abajo
 phtest(BE_model, FE_model, 
        data=cornwell, 
        model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 
 ``` 
-**Insertar tabla de Anzony**
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Hausman Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{Chi-Sq Statistic} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Between vs & & & \\
+  Fixed Effects Models & 16 & 53.591 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
 
-El test de Hausman nos permite rechazar la hipótesis nula, lo que nos invita a usar el estimador FE para lidiar con la heterogeneidad no observable a nivel de condado (ver Tabla 1).
+
+El test de Hausman nos permite rechazar la hipótesis nula, lo que nos invita a usar el estimador FE para lidiar con la heterogeneidad no observable a nivel de condado (ver Tabla 3).
 
 El efecto de controlar por condado hace que las estimaciones (en valor absoluto) de las variables de justicia disminuyan. Por ejemplo, la elasticidad estimada de la variables $P_A$ y $P_C$ disminuyeron en un $41\%$ y $43%$, respectivamente. A diferencia de las estimaciones between, el coeficiente $P_P$ estimado por efectos fijos tiene el signo correcto (negativo) y es significativo estadísticamente. Al igual que en el caso anterior, la estimación del parámetro $S$ es no significativa y de baja magnitud. Finalmente, se pudo observar que los efectos disuasorios estimados se pueden ordenar según el modelo económico del crimen ($|P_A|>|P_C|>|P_P|$).   
 
@@ -140,43 +159,67 @@ RE_model <- plm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpct
 
 
 # Hausman Test: 
-phtest(RE_model, FE_model, data=cornwell, model = c("random", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
+# Resultados se imputan abajo manualmente
+phtest(RE_model, FE_model,
+       data=cornwell, model = c("random", "within"), 
+       method = c("chisq", "aux"), index = NULL, vcov = NULL)
 ```
 
 Realizamos nuevamente el test de Hausman, pero esta vez comparando los estimadores del modelo de efectos aleatorios (RE) con los del modelo FE. Al igual que en el caso anterior, el estadístico nos permite rechazar la hipótesis nula de que $\alpha_i$ es ortogonal $(X'_{it},P'_{it})$. De nuevo, se puede concluir que la heterogeneidad no-observable a nivel de condado es estadísticamente significativa.
 
 Esto se da debido a que las estimaciones por efectos aleatorios no controlan efectos individuales (a nivel de condado), sino que los omite generando los sesgos discutidos anteriormente. 
 
-# 4. Comparando resultados
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Hausman Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{Chi-Sq Statistic} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Within vs & & & \\
+  Random Effects Models & 16 & 66.189 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
 
-*Insertar tabla Anzony*
+# 4. Comparando resultados
 
 ```{r echo=FALSE, results='asis'}
 
 library("stargazer")
 
-stargazer(BE_model, FE_model, RE_model, 
-          title="Resultados", dep.var.labels=c("Tasa de criminalidad"),          
+stargazer( BE_model, FE_model, RE_model, 
+          title="Resultados", 
+          dep.var.labels = c("Crime Rate"), 
           column.labels = c("Between (BE)", "Within (FE)","Random Effects (RE)" ),
-          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC','WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'),
-          notes.align = "l", align=TRUE, font.size = "small", no.space = T, header = F)
+          keep = c( "lprbarr", "lprbconv", "lprbpris", "lavgsen" ), 
+          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S'),
+          notes.align = "l",align=TRUE, font.size = "small", no.space = T, header = F)
 ```
 
 
-En la tabla 1 se observa que las estimaciones por FE y por RE (segunda y tercera columna) de $P_A$, $P_C$ y $P_P$ muestran los signos (negativos) y el ordenamiento propuesto por el modelo económico de crimen ($|P_A|>|P_C|>|P_P|$). Pos parámetros $P_A$, $P_C$ y $P_P$ son significativos en ambas estimaciones. Por otro lado, el coeficiente de $S$ muestra signo positivo y no es estadísticamente significativo.
+En la tabla 3 se observa que las estimaciones por FE y por RE (segunda y tercera columna) de $P_A$, $P_C$ y $P_P$ muestran los signos (negativos) y el ordenamiento propuesto por el modelo económico de crimen ($|P_A|>|P_C|>|P_P|$). Pos parámetros $P_A$, $P_C$ y $P_P$ son significativos en ambas estimaciones. Por otro lado, el coeficiente de $S$ muestra signo positivo y no es estadísticamente significativo.
 
 Así también, observa que las elasticidades de $P_A$, $P_C$ y $P_P$ son mayores en los modelos BE y RE que en el modelo FE. Por ejemplo, se observa que la elasticidad de $P_A$ en el modelo FE se reduce en un $7.23\%$ respecto a la obtenida con RE, mientras que para $P_C$ lo hace en $7.38\%$ y para $P_C$ en $2.55\%$. Las diferencias de magnitud entre la estimación BE y FE fueron planteadas en el inciso 2.
+
+*INSERTAR ULTIMA TABLA ACA*
 
 Tal y como indican Cornwell y Trumbull, omision de efectos por condado generan grandes diferencias en las estimaciones (en este caso entre between, within y efectos aleatorios). Dados los resultados del test de Hausman se concluyó que la heterogeneidad es estadísticamente importante en esta muestra, podemos concluir las estimaciones between y efectos aleatorios sobreestiman el efecto estimado de las variables de law enforcement, y que el modelo within es mas conveniente para anular este sesgo.     
 
 # 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
 
-```{r}
+```{r include=FALSE}
 
 ols<-lm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
                   lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
                 data = cornwell)
 
+# Los resultados del test son incluidos abajo manualmente
 lmtest::bptest(ols)
 
 # Estos dan lo mismo porque las formulas son iguales, los trata como un OLS
@@ -189,10 +232,31 @@ lmtest::bptest(ols)
 
 ```
 
-Para evaluar la presencia de efectos aleatorios se estimó un modelo a traves de mco y se utilizo el test de Breusch-Pagan. La hipotesis nula es la no existencia de efectos aleatorios ($H_0: \sigma^2_\mu=0$), testeando la presencia de heterocedasticidad en los erroes del modelo de pooled. Los resultados rechazan la hipotesis nula; por lo tanto, existen efectos aleatorios, los errores son heterocedasticos.
+Para evaluar la presencia de efectos aleatorios se estimó un modelo a traves de mco y se utilizó el test de Breusch-Pagan. La hipótesis nula es la no existencia de efectos aleatorios ($H_0: \sigma^2_\mu=0$), testeando la presencia de heterocedasticidad en los erroes del modelo de pooled. Los resultados rechazan la hipotesis nula; por lo tanto, existen efectos aleatorios, los errores son heterocedasticos.
+
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Breusch-Pagan Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{BP} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Between vs & & & \\
+  Linear Model & 20 & 188.15 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
 
 
-```{r}
+
+```{r include=FALSE}
+# Los resultados del test son incluidos abajo manualmente
+
 pdwtest(RE_model)
 ```
 Teniendo en cuenta la siguiente definición de los errores:
@@ -205,11 +269,36 @@ u_{it-1} = \mu_i+ \epsilon_{it-1}
 
 Se hace el test de autocorrelación serial sobre el modelo de efectos aleatorios y se rechaza la hipótesis nula. Por lo tanto, este modelo presenta autocorrelación. Esto puede estar relacionado con la omisión de los efectos fijos que genera que los errores $u_{it}$ y $u_{it-1}$ estén correlacionados generando un problema de sesgo.
 
+También se hace el test de autocorrelación serial sobre el modelo de efectos fijos y se rechaza la hipótesis nula. Por lo tanto, el modelo presenta autocorrelación serial. Esto sugiere que los errores $\epsilon_{it}$ y $\epsilon_{it-1}$ esten correlacionados.
 
-```{r}
+
+```{r include=FALSE}
+# resultados del test son incluidos abajo manualmente
 pdwtest(FE_model)
+
 ```
-Se realiza el test de autocorrelación serial sobre el modelo de efectos fijos y se rechaza la hipótesis nula. Por lo tanto, el modelo presenta autocorrelación serial. Esto sugiere que los errores $\epsilon_{it}$ y $\epsilon_{it-1}$ esten correlacionados.
+
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Durbin-Watson Test:}} \\ 
+\cline{2-3}\\ 
+\\[-1.8ex] &  \textbf{DW} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+ \textit{Random Effects Model} & 1.357 & 0.000 \\ 
+   & & \\
+  \textit{Fixed Effects Model} & 1.687 & 0.000 \\ 
+   & & \\
+\hline 
+\hline \\
+\end{tabular} 
+\end{table} 
+
+
+
 
 
 
