@@ -114,6 +114,7 @@ H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat
 \end{gather*}
 
 
+<<<<<<< HEAD
 ```{r include=FALSE, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 # los resultados de esta prueba fueron tabulados abajo
 phtest(BE_model, FE_model, 
@@ -121,6 +122,9 @@ phtest(BE_model, FE_model,
        model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 
 ``` 
+=======
+
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
 \begin{table}[!htbp] \centering 
   \caption{Test} 
   \label{} 
@@ -138,6 +142,11 @@ Between vs & & & \\
 \hline  \\
 \end{tabular} 
 \end{table} 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
 
 
 El test de Hausman nos permite rechazar la hipótesis nula, lo que nos invita a usar el estimador FE para lidiar con la heterogeneidad no observable a nivel de condado (ver Tabla 3).
@@ -196,7 +205,11 @@ library("stargazer")
 stargazer( BE_model, FE_model, RE_model, 
           title="Resultados", 
           dep.var.labels = c("Crime Rate"), 
+<<<<<<< HEAD
           column.labels = c("Between (BE)", "Within (FE)","Random Effects (RE)" ),
+=======
+          column.labels = c("Between (BE)", "Within (EF)","Random Effects (RE)" ),
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
           keep = c( "lprbarr", "lprbconv", "lprbpris", "lavgsen" ), 
           covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S'),
           notes.align = "l",align=TRUE, font.size = "small", no.space = T, header = F)
@@ -213,7 +226,29 @@ Tal y como indican Cornwell y Trumbull, omision de efectos por condado generan g
 
 # 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
 
+<<<<<<< HEAD
 ```{r include=FALSE}
+=======
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Breusch-Pagan Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{BP} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Between vs & & & \\
+  Linear Model & 20 & 188.15 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
+
+```{r echo=FALSE, include=FALSE}
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
 
 ols<-lm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
                   lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
@@ -253,10 +288,35 @@ Between vs & & & \\
 \end{table} 
 
 
+<<<<<<< HEAD
 
 ```{r include=FALSE}
 # Los resultados del test son incluidos abajo manualmente
 
+=======
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Durbin-Watson Test:}} \\ 
+\cline{2-3}\\ 
+\\[-1.8ex] &  \textbf{DW} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+ \textit{Random Effects Model} & 1.357 & 0.000 \\ 
+   & & \\
+  \textit{Fixed Effects Model} & 1.687 & 0.000 \\ 
+   & & \\
+\hline 
+\hline \\
+\end{tabular} 
+\end{table} 
+
+
+
+```{r echo=FALSE, include=FALSE }
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
 pdwtest(RE_model)
 ```
 Teniendo en cuenta la siguiente definición de los errores:
@@ -271,9 +331,13 @@ Se hace el test de autocorrelación serial sobre el modelo de efectos aleatorios
 
 También se hace el test de autocorrelación serial sobre el modelo de efectos fijos y se rechaza la hipótesis nula. Por lo tanto, el modelo presenta autocorrelación serial. Esto sugiere que los errores $\epsilon_{it}$ y $\epsilon_{it-1}$ esten correlacionados.
 
+<<<<<<< HEAD
 
 ```{r include=FALSE}
 # resultados del test son incluidos abajo manualmente
+=======
+```{r echo=FALSE, include=FALSE}
+>>>>>>> 757fa87904969bc08d68db32967ed273e724e447
 pdwtest(FE_model)
 
 ```
