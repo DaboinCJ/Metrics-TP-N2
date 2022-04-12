@@ -19,6 +19,7 @@ library('stargazer')
 
 
 # 0.2 Load Data ----------------------------------
+setwd( "C:/Users/Anzony/Documents/GitHub/Metrics-TP-N2" )
 cornwell <- read_csv("datos/cornwell.csv")
 
 
@@ -62,6 +63,20 @@ stargazer(BE_model, FE_model, title="Resultados", dep.var.labels=c("Crime Rate")
                              'WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'),
           notes.align = "l",align=TRUE, out = "Table1.tex")
 
+
+
+stargazer(BE_model, FE_model, 
+          title="Resultados", 
+          dep.var.labels = c("Crime Rate"), 
+          keep = c( "lprbarr", "lprbconv", "lprbpris", "lavgsen" ), 
+          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S'),
+          notes.align = "l",align=TRUE, out = "Table3.tex")
+
+
+
+
+
+
 #-------------------------------------------#
 # RE Model (Table 3 Cornwell) --------------#
 
@@ -74,6 +89,13 @@ summary(RE_model)
 # Hausman Test: 
 phtest(RE_model, FE_model, data=cornwell, model = c("random", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 
+
+stargazer( BE_model, FE_model, RE_model, 
+          title="Resultados", 
+          dep.var.labels = c("Crime Rate"), 
+          keep = c( "lprbarr", "lprbconv", "lprbpris", "lavgsen" ), 
+          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S'),
+          notes.align = "l",align=TRUE, out = "Table4.tex")
   
 #-------------------------------------------#
 # Table of results -------------------------#
@@ -88,4 +110,11 @@ stargazer(BE_model, FE_model, RE_model, title="Resultados", dep.var.labels=c("Cr
 
 ## TEST BPG 
 bptest(FE_model)
+
+
+
+### Test de Hausman for bet and fe models
+phtest(BE_model, FE_model, 
+       data=cornwell, 
+       model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 

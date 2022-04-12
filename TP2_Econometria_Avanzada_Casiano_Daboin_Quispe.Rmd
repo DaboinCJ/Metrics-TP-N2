@@ -111,19 +111,32 @@ H = ( \hat \beta_{BE} - \hat \beta_{EF})' (\Omega_{EF}-\Omega_{BE})^{-1}  ( \hat
 \end{gather*}
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
-phtest(BE_model, FE_model, 
-       data=cornwell, 
-       model = c("between", "within"), method = c("chisq", "aux"), index = NULL, vcov = NULL)
 
-``` 
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Hausman Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{Chi-Sq Statistic} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Between vs & & & \\
+  Fixed Effects Models & 16 & 53.591 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
+
+
 
 
 El test de Hausman rechaza la hipótesis nula de que $\alpha_i$ es ortogonal $(X'_{it},P'_{it})$, es decir, en base a este test se puede concluir que la heterogeneidad no observable a nivel de condado es estadísticamente importante y que conviene usar la estimacion con efectos fijos.
 
 
 
-**Insertar tabla de Anzony**
 
 El efecto de controlar por condado hace que las estimaciones (en valor absoluto) de las variables de justicia disminuyan. Por ejemplo, para la variable $P_A$ la elasticidad estimada disminuyó aproximadamente $41\%$, mientras que para la variable $P_C$ disminuyó $43\%$ aproximadamente. A diferencia de las estimaciones between, el coeficiente $P_P$ estimado por efectos fijos tiene no sólo el signo correcto (negativo) sino es significativo estadísticamente. Al igual que en el caso anterior, la estimación del parámetro $S$ es no significativa y de pequeño impacto. Finalmente, se pudo observar que los efectos disuasorios estimador (en valor absoluto) se pueden ordenar según el modelo económico del crimen ($P_A>P_C>P_P$).   
 
@@ -155,11 +168,13 @@ Al igual que en el caso anterior, el test de Hausman rechaza la hipótesis nula 
 
 library("stargazer")
 
-stargazer(BE_model, FE_model, RE_model, 
-          title="Resultados", dep.var.labels=c("Tasa de criminalidad"),          
+stargazer( BE_model, FE_model, RE_model, 
+          title="Resultados", 
+          dep.var.labels = c("Crime Rate"), 
           column.labels = c("Between (BE)", "Within (EF)","Random Effects (RE)" ),
-          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S','Police','Density','Percent of young male','WCON','WTUC','WTRD','WFIR','WSER','WMFG','WFED','WSTA','WLOC','West','Central','Urban','Percent minority'),
-          notes.align = "l", align=TRUE, font.size = "small", no.space = T, header = F)
+          keep = c( "lprbarr", "lprbconv", "lprbpris", "lavgsen" ), 
+          covariate.labels=c('$P_{A}$','$P_{C}$','$P_{P}$','S'),
+          notes.align = "l",align=TRUE, font.size = "small", no.space = T, header = F)
 ```
 
 
@@ -173,7 +188,25 @@ Tal y como indican Cornwell y Trumbull, omision de efectos por condado generan g
 
 # 5. Comentarios sobre la presencia de efectos aleatorios y correlacion serial de primer orden
 
-```{r}
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{2pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3}} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Breusch-Pagan Test:}} \\ 
+\cline{2-4}\\ 
+\\[-1.8ex] & \textit{df} & \textbf{BP} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+Between vs & & & \\
+  Linear Model & 20 & 188.15 & 0.000 \\ 
+   & & & \\
+\hline 
+\hline  \\
+\end{tabular} 
+\end{table} 
+
+```{r echo=FALSE, include=FALSE}
 
 ols<-lm(lcrmrte ~ lprbarr+lprbconv+lprbpris+lavgsen+lpolpc+ldensity+lpctymle+lwcon+lwtuc+lwtrd+
                   lwfir+lwser+lwmfg+lwfed+lwsta+lwloc+west+central+urban+lpctmin,
@@ -194,7 +227,28 @@ lmtest::bptest(ols)
 Para evaluar la presencia de efectos aleatorios se estimó un modelo a traves de mco y se utilizo el test de Breusch-Pagan. La hipotesis nula es la no existencia de efectos aleatorios ($H_0: \sigma^2_\mu=0$), testeando la presencia de heterocedasticidad en los erroes del modelo de pooled. Los resultados rechazan la hipotesis nula; por lo tanto, existen efectos aleatorios, los errores son heterocedasticos.
 
 
-```{r}
+\begin{table}[!htbp] \centering 
+  \caption{Test} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Durbin-Watson Test:}} \\ 
+\cline{2-3}\\ 
+\\[-1.8ex] &  \textbf{DW} & \textit{p}-values \\ 
+\hline \\[-1.8ex] 
+ \textit{Random Effects Model} & 1.357 & 0.000 \\ 
+   & & \\
+  \textit{Fixed Effects Model} & 1.687 & 0.000 \\ 
+   & & \\
+\hline 
+\hline \\
+\end{tabular} 
+\end{table} 
+
+
+
+```{r echo=FALSE, include=FALSE }
 pdwtest(RE_model)
 ```
 Teniendo en cuenta la siguiente definición de los errores:
@@ -208,7 +262,7 @@ u_{it-1} = \mu_i+ \epsilon_{it-1}
 Se hace el test de autocorrelación serial sobre el modelo de efectos aleatorios y se rechaza la hipótesis nula. Por lo tanto, este modelo presenta autocorrelación. Esto puede estar relacionado con la omisión de los efectos fijos que genera que los errores $u_{it}$ y $u_{it-1}$ estén correlacionados generando un problema de sesgo.
 
 
-```{r}
+```{r echo=FALSE, include=FALSE}
 pdwtest(FE_model)
 ```
 Se realiza el test de autocorrelación serial sobre el modelo de efectos fijos y se rechaza la hipótesis nula. Por lo tanto, el modelo presenta autocorrelación serial. Esto sugiere que los errores $\epsilon_{it}$ y $\epsilon_{it-1}$ esten correlacionados.
