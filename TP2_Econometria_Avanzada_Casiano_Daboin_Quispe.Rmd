@@ -22,6 +22,7 @@ header-includes:
 ```{r setup, include=FALSE}
 # Nota de los autores:
 ## Este documento contiene todo el analisis econometrico necesario para responder las consignas.
+#
 
 knitr::opts_chunk$set(echo = FALSE, 
                       warning = FALSE,
